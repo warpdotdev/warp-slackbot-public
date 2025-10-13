@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  slack-docker-poller:
+    build:
+      context: .
+      args:
+        # Set to 'arm64' for ARM processors, 'amd64' for Intel/AMD processors
+        TARGETARCH: ${DOCKER_ARCH:-amd64}
+    container_name: slack-docker-poller
+    environment:
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - WARP_API_KEY=${WARP_API_KEY}
+      - NOTEBOOK_ID=${NOTEBOOK_ID}
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    volumes:
+      # Persist cloned repositories for faster restarts
+      - repos_data:/app/repos
+      # Mount logs directory for warp-cli agent output
+      - logs_data:/app/logs
+
+volumes:
+  repos_data:
+  logs_data:

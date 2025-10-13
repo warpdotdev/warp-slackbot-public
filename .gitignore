@@ -1,0 +1,20 @@
+# Environment variables
+.env*
+!.env.example
+
+# Virtual environments
+venv/
+
+# Configuration files (use templates instead)
+repos.yaml
+
+# Project directories
+repos/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
