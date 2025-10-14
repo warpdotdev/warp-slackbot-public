@@ -53,20 +53,23 @@ def handle_app_mentions(body, say, logger, client):
     full_context_with_metadata = full_context + slack_metadata
     
     # Run the warp agent command with the full context (thread or single message)
-    print("full",full_context_with_metadata, flush=True)
+    print("Message",full_context_with_metadata, flush=True)
     try:
         say("Processing request...", thread_ts=thread_ts or ts)
         #TODO move slack_send 'tool' into main prompt
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         logfile = f"/app/logs/{timestamp}.log"
-        cmd = (
-            f"mkdir -p /app/logs && "
-            f"warp-cli agent run "
-            f"--api-key {WARP_API_KEY} "
-            f"--prompt {get_prompt(NOTEBOOK_ID, full_context_with_metadata)} "
-            f"| tee {logfile}"
-        )
-        result = subprocess.run(cmd, shell=True, text=True)
+        # Build command as list to avoid shell=True
+        cmd = [
+            "warp-cli", "agent", "run",
+            "--api-key", WARP_API_KEY,
+            "--prompt", get_prompt(NOTEBOOK_ID, full_context_with_metadata)
+        ]
+        
+        # Run command and log output (tee functionality)
+        with open(logfile, 'w') as f:
+            print(f"View logs {logfile}")
+            result = subprocess.run(cmd, text=True, stdout=f, stderr=subprocess.STDOUT)
         
         if result.returncode == 0:
             response = f"Command executed successfully. Output logged to {logfile}"

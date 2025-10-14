@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   slack-docker-poller:
     build:
@@ -7,6 +5,7 @@ services:
       args:
         # Set to 'arm64' for ARM processors, 'amd64' for Intel/AMD processors
         TARGETARCH: ${DOCKER_ARCH:-amd64}
+    init: true #handle zombie process reaping
     container_name: slack-docker-poller
     environment:
       - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
