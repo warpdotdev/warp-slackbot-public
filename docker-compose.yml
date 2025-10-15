@@ -5,6 +5,7 @@ services:
       args:
         # Set to 'arm64' for ARM processors, 'amd64' for Intel/AMD processors
         TARGETARCH: ${DOCKER_ARCH:-amd64}
+        CHANNEL: ${CHANNEL:-stable}
     init: true #handle zombie process reaping
     container_name: slack-docker-poller
     environment:
@@ -13,6 +14,8 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - WARP_API_KEY=${WARP_API_KEY}
       - NOTEBOOK_ID=${NOTEBOOK_ID}
+      - CHANNEL=${CHANNEL}
+      - PROFILE=${PROFILE}
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
     volumes:
