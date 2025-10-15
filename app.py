@@ -9,6 +9,11 @@ SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 SLACK_APP_TOKEN = os.environ.get("SLACK_APP_TOKEN")
 NOTEBOOK_ID = os.environ.get("NOTEBOOK_ID")
 WARP_API_KEY = os.environ.get("WARP_API_KEY")
+CHANNEL = os.environ.get("CHANNEL", "stable")
+PROFILE = os.environ.get("PROFILE")
+
+# Determine the correct warp-cli binary name based on channel
+WARP_CLI_BINARY = "warp-cli-dev" if CHANNEL == "dev" else "warp-cli"
 
 # Initialize the Bolt app
 app = App(token=SLACK_BOT_TOKEN)
@@ -61,10 +66,14 @@ def handle_app_mentions(body, say, logger, client):
         logfile = f"/app/logs/{timestamp}.log"
         # Build command as list to avoid shell=True
         cmd = [
-            "warp-cli", "agent", "run",
+            WARP_CLI_BINARY, "agent", "run",
             "--api-key", WARP_API_KEY,
             "--prompt", get_prompt(NOTEBOOK_ID, full_context_with_metadata)
         ]
+        
+        # Add profile if present
+        if PROFILE:
+            cmd.extend(["--profile", PROFILE])
         
         # Run command and log output (tee functionality)
         with open(logfile, 'w') as f:

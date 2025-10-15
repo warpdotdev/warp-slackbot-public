@@ -41,13 +41,15 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
     # Install Warp CLI using architecture-specific download (staging URL for dev channel)
     if [ "$CHANNEL" = "dev" ]; then \
+        echo "Installing Warp CLI dev version..." && \
         wget --output-document=warp-cli.deb "https://staging.warp.dev/download/cli?os=linux&package=deb&channel=dev&arch=${TARGETARCH}"; \
     else \
+        echo "Installing Warp CLI prod version..." && \
         wget --output-document=warp-cli.deb "https://app.warp.dev/download/cli?os=linux&package=deb&arch=${TARGETARCH}"; \
     fi && \
     dpkg -i warp-cli.deb || (apt-get update && apt-get install -f -y) && \
     dpkg -i warp-cli.deb && \
-    which warp-cli && \
+    (which warp-cli || which warp-cli-dev) && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives warp-cli.deb
 
 # Copy application code and setup script
