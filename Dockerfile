@@ -7,6 +7,7 @@ WORKDIR /app
 
 # Set architecture variable for Warp CLI (build-time only)
 ARG TARGETARCH
+ARG CHANNEL 
 
 # Copy Python requirements first for better caching
 COPY requirements.txt .
@@ -38,8 +39,12 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3 -m venv /app/venv && \
     # Activate venv and install dependencies
     /app/venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    # Install Warp CLI using architecture-specific download
-    wget --output-document=warp-cli.deb "https://app.warp.dev/download/cli?os=linux&package=deb&arch=${TARGETARCH}" && \
+    # Install Warp CLI using architecture-specific download (staging URL for dev channel)
+    if [ "$CHANNEL" = "dev" ]; then \
+        wget --output-document=warp-cli.deb "https://staging.warp.dev/download/cli?os=linux&package=deb&channel=dev&arch=${TARGETARCH}"; \
+    else \
+        wget --output-document=warp-cli.deb "https://app.warp.dev/download/cli?os=linux&package=deb&arch=${TARGETARCH}"; \
+    fi && \
     dpkg -i warp-cli.deb || (apt-get update && apt-get install -f -y) && \
     dpkg -i warp-cli.deb && \
     which warp-cli && \
@@ -70,3 +75,4 @@ ENV PYTHONUNBUFFERED=1
 
 # Run the setup script which clones repos and starts the Python application
 CMD ["/app/setup.sh"]
+
