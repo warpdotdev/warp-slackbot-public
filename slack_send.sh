@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Simple Slack message sender
-# Usage: ./slack_send.sh <channel> <message> [thread_ts]
+# Usage: ./slack_send.sh <channel> <message> <thread_ts>
 
-if [ $# -lt 2 ]; then
-    echo "Usage: $0 <channel> <message> [thread_ts]"
+if [ $# -lt 3 ]; then
+    echo "Usage: $0 <channel> <message> <thread_ts>"
     echo "Examples:"
-    echo "  $0 '#general' 'Hello world'"
     echo "  $0 'C1234567890' 'Reply message' '1234567890.123456'"
     exit 1
 fi
@@ -29,13 +28,8 @@ if [ -z "$SLACK_BOT_TOKEN" ]; then
 fi
 
 # Build JSON payload using jq for proper escaping
-if [ -n "$THREAD_TS" ]; then
-    JSON_DATA=$(jq -n --arg channel "$CHANNEL" --arg text "$MESSAGE" --arg thread_ts "$THREAD_TS" \
-        '{channel: $channel, text: $text, thread_ts: $thread_ts}')
-else
-    JSON_DATA=$(jq -n --arg channel "$CHANNEL" --arg text "$MESSAGE" \
-        '{channel: $channel, text: $text}')
-fi
+JSON_DATA=$(jq -n --arg channel "$CHANNEL" --arg text "$MESSAGE" --arg thread_ts "$THREAD_TS" \
+    '{channel: $channel, text: $text, thread_ts: $thread_ts}')
 
 # Send the message
 curl -X POST https://slack.com/api/chat.postMessage \
