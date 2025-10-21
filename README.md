@@ -36,6 +36,8 @@ Edit `.env` with your credentials:
 
 Follow the instructions in `.env` for where to get relevant variables.
 
+See https://docs.warp.dev/developers/cli#generating-api-keys for generating API key.
+
 ### 3. Repository Configuration
 
 Create your repository configuration from the template:
